@@ -1,25 +1,40 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Hockey Integration" do
-      it "raises an error if no ipa file was given" do
+      it "raises an error if no build file was given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             hockey({
               api_token: 'xxx'
             })
           end").runner.execute(:test)
-        end.to raise_error("You have to provide an ipa file")
+        end.to raise_error("You have to provide a build file")
       end
 
-      it "raises an error if given ipa file was not found" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            hockey({
-              api_token: 'xxx',
-              ipa: './notHere.ipa'
-            })
-          end").runner.execute(:test)
-        end.to raise_error("Couldn't find ipa file at path './notHere.ipa'".red)
+      describe "iOS" do
+        it "raises an error if given ipa file was not found" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              hockey({
+                api_token: 'xxx',
+                ipa: './notHere.ipa'
+              })
+            end").runner.execute(:test)
+          end.to raise_error("Couldn't find ipa file at path './notHere.ipa'".red)
+        end
+      end
+
+      describe "Android" do
+        it "raises an error if given apk file was not found" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              hockey({
+                api_token: 'xxx',
+                apk: './notHere.ipa'
+              })
+            end").runner.execute(:test)
+          end.to raise_error("Couldn't find apk file at path './notHere.ipa'".red)
+        end
       end
 
       it "raises an error if supplied dsym file was not found" do
@@ -38,7 +53,7 @@ describe Fastlane do
         Fastlane::FastFile.new.parse("lane :test do
           hockey({
             api_token: 'xxx',
-            ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+            apk: './fastlane/spec/fixtures/fastfiles/Fastfile1'
           })
         end").runner.execute(:test)
       end

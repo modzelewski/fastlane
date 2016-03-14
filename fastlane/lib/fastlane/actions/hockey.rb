@@ -13,17 +13,20 @@ module Fastlane
       def self.run(options)
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
 
+        @options = options
+
         require 'shenzhen'
         require 'shenzhen/plugins/hockeyapp'
 
         if options[:dsym]
           dsym_filename = options[:dsym]
         else
-          if options[:ipa].to_s.length == 0
-            UI.user_error!("You have to provide an ipa file")
+
+          if build_file.nil?
+            UI.user_error!("You have to provide a build file")
           end
 
-          dsym_path = options[:ipa].gsub('ipa', 'app.dSYM.zip')
+          dsym_path = options[:ipa].to_s.gsub('ipa', 'app.dSYM.zip')
           if File.exist?(dsym_path)
             dsym_filename = dsym_path
           else
@@ -44,7 +47,7 @@ module Fastlane
 
         return values if Helper.test?
 
-        ipa_filename = options[:ipa]
+        ipa_filename = build_file
         ipa_filename = nil if options[:upload_dsym_only]
 
         response = client.upload_build(ipa_filename, values)
@@ -72,6 +75,14 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :apk,
+                                       env_name: "FL_HOCKEY_APK",
+                                       description: "Path to your APK file",
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         raise "Couldn't find apk file at path '#{value}'".red unless File.exist?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_HOCKEY_API_TOKEN",
                                        description: "API Token for Hockey Access",
@@ -172,6 +183,16 @@ module Fastlane
       def self.is_supported?(platform)
         [:ios, :mac, :android].include? platform
       end
+
+private
+
+      def self.build_file
+        [
+          @options[:ipa],
+          @options[:apk]
+        ].detect { |e| !e.to_s.empty? }
+      end
+
     end
   end
 end
