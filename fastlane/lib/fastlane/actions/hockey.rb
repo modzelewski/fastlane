@@ -184,8 +184,6 @@ module Fastlane
         [:ios, :mac, :android].include? platform
       end
 
-private
-
       def self.build_file
         [
           @options[:ipa],
