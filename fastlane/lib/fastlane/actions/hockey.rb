@@ -13,10 +13,13 @@ module Fastlane
       def self.run(options)
         # Available options: http://support.hockeyapp.net/kb/api/api-versions#upload-version
 
-        @options = options
-
         require 'shenzhen'
         require 'shenzhen/plugins/hockeyapp'
+
+        build_file = [
+          @options[:ipa],
+          @options[:apk]
+        ].detect { |e| !e.to_s.empty? }
 
         if options[:dsym]
           dsym_filename = options[:dsym]
@@ -190,13 +193,6 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac, :android].include? platform
-      end
-
-      def self.build_file
-        [
-          @options[:ipa],
-          @options[:apk]
-        ].detect { |e| !e.to_s.empty? }
       end
 
     end
