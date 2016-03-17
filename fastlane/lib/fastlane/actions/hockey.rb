@@ -17,8 +17,8 @@ module Fastlane
         require 'shenzhen/plugins/hockeyapp'
 
         build_file = [
-          @options[:ipa],
-          @options[:apk]
+          options[:ipa],
+          options[:apk]
         ].detect { |e| !e.to_s.empty? }
 
         if options[:dsym]
@@ -30,7 +30,7 @@ module Fastlane
           end
 
           dsym_path = options[:ipa].to_s.gsub('ipa', 'app.dSYM.zip')
-          if File.exist?(dsym_path)
+          if options[:ipa] && File.exist?(dsym_path)
             dsym_filename = dsym_path
           else
             UI.important("Symbols not found on path #{File.expand_path(dsym_path)}. Crashes won't be symbolicated properly")
