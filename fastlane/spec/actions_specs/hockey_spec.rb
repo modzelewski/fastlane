@@ -49,6 +49,18 @@ describe Fastlane do
         end.to raise_error("Symbols on path '#{File.expand_path('../notHere.dSYM.zip')}' not found".red)
       end
 
+      it "raises an error if both ipa and apk provided" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            hockey({
+              api_token: 'xxx',
+              ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+              apk: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+            })
+          end").runner.execute(:test)
+        end.to raise_error("You can't use 'ipa' and 'apk' options in one run".red)
+      end
+
       it "works with valid parameters" do
         Fastlane::FastFile.new.parse("lane :test do
           hockey({

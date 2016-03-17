@@ -82,6 +82,10 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          raise "Couldn't find apk file at path '#{value}'".red unless File.exist?(value)
+                                       end,
+                                       conflicting_options: [:ipa],
+                                       conflict_block: proc do |value|
+                                         raise "You can't use 'apk' and '#{value.key}' options in one run".red
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_HOCKEY_API_TOKEN",
@@ -96,6 +100,10 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          raise "Couldn't find ipa file at path '#{value}'".red unless File.exist?(value)
+                                       end,
+                                       conflicting_options: [:apk],
+                                       conflict_block: proc do |value|
+                                         raise "You can't use 'ipa' and '#{value.key}' options in one run".red
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym,
                                        env_name: "FL_HOCKEY_DSYM",
@@ -177,7 +185,7 @@ module Fastlane
       end
 
       def self.author
-        "KrauseFx"
+        ["KrauseFx", "modzelewski"]
       end
 
       def self.is_supported?(platform)
